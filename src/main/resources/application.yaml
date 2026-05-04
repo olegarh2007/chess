@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: Chess
+  datasource:
+    url: jdbc:postgresql://localhost:5432/chess
+    username: oleg
+    password: 2007
+    driver-class-name: org.postgresql.Driver
