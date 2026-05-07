@@ -1,0 +1,8 @@
+создай sql для создания таблиц:
+users: id, login, email, password_hash
+user_timestamps: id, user_id, registration_date, last_login_time
+user_media: id, user_id, avatar_url, background_url
+user_chat: id, user_id, chat_id
+chat: id, name
+chat_media: id, chat_id, avatar_url, background_url
+message: id, chat_id, sender_id, content, timestamp
