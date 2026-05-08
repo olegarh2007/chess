@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -11,7 +14,6 @@ import java.util.Set;
 @Getter
 @Setter
 public class Chat {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,13 +21,23 @@ public class Chat {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ChatMedia> chatMedia;
+    @Column(nullable = false)
+    private String description;
+
+    @OneToOne(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ChatMedia chatMedia;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserChat> userChats;
+    private Set<UserChat> userChats = new HashSet<>();
 
+    public void addUser(User user) {
+        UserChat userChat = new UserChat();
+        userChat.setUser(user);
+        userChat.setChat(this);
+        userChats.add(userChat);
+        user.addChat(userChat);
+    }
 }

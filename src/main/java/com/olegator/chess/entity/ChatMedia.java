@@ -16,7 +16,7 @@ public class ChatMedia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "chat_id", nullable = false)
     private Chat chat;
 

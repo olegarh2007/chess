@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -31,5 +32,9 @@ public class User {
     private UserMedia userMedia;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserChat> userChats;
+    private Set<UserChat> userChats = new HashSet<>();
+
+    public void addChat(UserChat userChat) {
+        userChats.add(userChat);
+    }
 }

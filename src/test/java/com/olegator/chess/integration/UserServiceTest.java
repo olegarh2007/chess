@@ -2,7 +2,6 @@ package com.olegator.chess.integration;
 
 import com.olegator.chess.annotation.IT;
 import com.olegator.chess.dto.UserRegDto;
-import com.olegator.chess.entity.User;
 import com.olegator.chess.repository.UserRepository;
 import com.olegator.chess.service.UserService;
 import jakarta.transaction.Transactional;

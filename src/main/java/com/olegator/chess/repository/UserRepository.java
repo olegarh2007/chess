@@ -11,4 +11,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     @EntityGraph(attributePaths = {"userTimestamp", "userMedia"})
     Optional<User> findForPageById(Long id);
+    boolean existsByLogin(String login);
+    boolean existsByEmail(String email);
 }
