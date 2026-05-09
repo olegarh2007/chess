@@ -1,5 +1,6 @@
 package com.olegator.chess.controller;
 
+import com.olegator.chess.dto.LoginDto;
 import com.olegator.chess.service.JwtService;
 import com.olegator.chess.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,10 +37,9 @@ class LoginControllerTest {
         String password = "testPassword";
         String token = "mockToken";
 
-        when(userService.checkUserLogin(username, password)).thenReturn(true);
         when(jwtService.generateToken(username)).thenReturn(token);
 
-        ResponseEntity<Map<String, String>> response = loginController.login(username, password);
+        ResponseEntity<Map<String, String>> response = loginController.login(new LoginDto(username, password));
 
         assertEquals(200, response.getStatusCode().value());
         assertEquals(Map.of("token", token), response.getBody());
@@ -50,9 +50,7 @@ class LoginControllerTest {
         String username = "testUser";
         String password = "wrongPassword";
 
-        when(userService.checkUserLogin(username, password)).thenReturn(false);
-
-        ResponseEntity<Map<String, String>> response = loginController.login(username, password);
+        ResponseEntity<Map<String, String>> response = loginController.login(new LoginDto(username, password));
 
         assertEquals(401, response.getStatusCode().value());
         assertEquals(Map.of("error", "Invalid credentials"), response.getBody());

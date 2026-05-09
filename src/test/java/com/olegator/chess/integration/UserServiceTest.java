@@ -23,7 +23,7 @@ public class UserServiceTest {
 
     @Test
     void testRegistration() {
-        UserRegDto userRegDto = new UserRegDto("olegator2007", "oleg.937.cherkasov@gmail.com", "2007");
+        UserRegDto userRegDto = new UserRegDto("olegator2007", "oleg.937.cherkasov@gmail.com", "oleg", "2007");
         userService.registerUser(userRegDto);
 
         var maybeUser = userRepository.findByLogin("olegator2007");

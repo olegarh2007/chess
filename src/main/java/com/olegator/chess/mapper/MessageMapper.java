@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface MessageMapper {
     @Mapping(target = "senderId", source = "sender.id")
-    @Mapping(target = "senderLogin", source = "sender.login")
+    @Mapping(target = "senderLogin", source = "sender.email")
     @Mapping(target = "senderAvatarUrl", source = "sender.userMedia.avatarUrl")
     MessageDto toMessageDto(Message message);
 }
