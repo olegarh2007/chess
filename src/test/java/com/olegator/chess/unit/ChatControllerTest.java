@@ -1,6 +1,6 @@
 package com.olegator.chess.unit;
 
-import com.olegator.chess.controller.ChatResrController;
+import com.olegator.chess.controller.ChatRestController;
 import com.olegator.chess.dto.ChatSummaryDto;
 import com.olegator.chess.service.ChatService;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ChatResrController.class)
+@WebMvcTest(ChatRestController.class)
 class ChatControllerTest {
 
     @Autowired
