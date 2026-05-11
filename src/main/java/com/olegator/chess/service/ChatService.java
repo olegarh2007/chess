@@ -1,7 +1,6 @@
 package com.olegator.chess.service;
 
-import com.olegator.chess.dto.ChatSummaryDto;
-import com.olegator.chess.dto.MessageDto;
+import com.olegator.chess.dto.*;
 import com.olegator.chess.entity.Chat;
 import com.olegator.chess.entity.User;
 import com.olegator.chess.entity.UserChat;
@@ -16,6 +15,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,8 +42,8 @@ public class ChatService {
                         .orElse(false);
     }
 
-    private void addUsers(Set<Long> users_ids, Chat chat) {
-        users_ids.forEach(userId -> {
+    private void addUsers(Set<Long> usersIds, Chat chat) {
+        usersIds.forEach(userId -> {
             var maybeUser = userRepository.findById(userId);
             if (maybeUser.isEmpty()) {
                 throw new IllegalArgumentException("User with id " + userId + " not found");
@@ -88,5 +88,16 @@ public class ChatService {
                 .map(messageMapper::toMessageDto)
                 .collect(Collectors.toList());
         return messages;
+    }
+
+    public ChatCreatedDto createNewChat(ChatCreationDto chatCreationDto, Long userId) {
+        Chat chat = new Chat();
+        chat.setName(chatCreationDto.name());
+        chat.setDescription(chatCreationDto.description());
+        chatRepository.save(chat);
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("No user with id " + userId));
+        chat.addUser(user);
+        return chatMapper.mapToCreated(chat);
     }
 }

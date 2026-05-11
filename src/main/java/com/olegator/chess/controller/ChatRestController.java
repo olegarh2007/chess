@@ -1,5 +1,7 @@
 package com.olegator.chess.controller;
 
+import com.olegator.chess.dto.ChatCreatedDto;
+import com.olegator.chess.dto.ChatCreationDto;
 import com.olegator.chess.dto.ChatSummaryDto;
 import com.olegator.chess.dto.MessageDto;
 import com.olegator.chess.security.UserDetailsImpl;
@@ -7,10 +9,9 @@ import com.olegator.chess.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -30,5 +31,12 @@ public class ChatRestController {
                                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
         List<MessageDto> messages = chatService.getChatMessages(chatId, userDetails.getId());
         return ResponseEntity.ok(messages);
+    }
+
+    @PostMapping("/api/chats/create")
+    public ResponseEntity<ChatCreatedDto> createNewChat(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                         @RequestBody ChatCreationDto chatCreationDto) {
+        var creationResponse = chatService.createNewChat(chatCreationDto, userDetails.getId());
+        return ResponseEntity.created(URI.create("/api/chats." + creationResponse.id())).body(creationResponse);
     }
 }

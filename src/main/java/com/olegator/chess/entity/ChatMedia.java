@@ -11,7 +11,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "chat_media")
 public class ChatMedia {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
