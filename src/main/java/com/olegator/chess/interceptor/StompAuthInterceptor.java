@@ -1,8 +1,9 @@
 package com.olegator.chess.interceptor;
 
-import com.olegator.chess.service.ChatService;
 import com.olegator.chess.service.JwtService;
+import com.olegator.chess.service.UserChatService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -20,13 +21,15 @@ import java.security.Principal;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class StompAuthInterceptor implements ChannelInterceptor {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final ChatService chatService;
+    private final UserChatService userChatService;
 
     @Override
     public @Nullable Message<?> preSend(Message<?> message, MessageChannel channel) {
+        log.debug("HELLO!");
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         if (accessor == null) {
             throw new IllegalStateException("null accessor");
@@ -54,8 +57,7 @@ public class StompAuthInterceptor implements ChannelInterceptor {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
-        }
-        if (StompCommand.SUBSCRIBE.equals(accessor.getCommand()) || StompCommand.SEND.equals(accessor.getCommand())) {
+        } else if (StompCommand.SUBSCRIBE.equals(accessor.getCommand()) || StompCommand.SEND.equals(accessor.getCommand())) {
             Principal principal = accessor.getUser();
             String destination = accessor.getDestination();
 
@@ -65,7 +67,7 @@ public class StompAuthInterceptor implements ChannelInterceptor {
 
             if (destination.startsWith("/topic/chat") || destination.startsWith("/app/chat")) {
                 Long chatId = extractChatId(destination);
-                if (!chatService.isMemberByEmail(principal.getName(), chatId)) {
+                if (!userChatService.isMemberByEmail(principal.getName(), chatId)) {
                     throw new IllegalArgumentException("User is not a member of this chat");
                 }
             }

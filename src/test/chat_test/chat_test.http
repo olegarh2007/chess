@@ -1,0 +1,18 @@
+POST http://localhost:8080/register
+Content-Type: application/json
+
+{
+  "username": "oleg",
+  "login": "olegator2007",
+  "email": "oleg.937.cherkasov@gmail.com",
+  "password": "2007"
+}
+
+> {% client.global.set("token", response.body.token); %}
+
+###
+
+WEBSOCKET ws://localhost:8080/ws
+
+CONNECT
+Authorization: Bearer {{token}}

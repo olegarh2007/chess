@@ -1,13 +1,14 @@
 package com.olegator.chess.mapper;
 
-import com.olegator.chess.dto.ChatCreatedDto;
-import com.olegator.chess.dto.ChatMediaDto;
-import com.olegator.chess.dto.ChatProfileDto;
-import com.olegator.chess.dto.ChatSummaryDto;
-import com.olegator.chess.entity.Chat;
-import com.olegator.chess.entity.ChatMedia;
-import com.olegator.chess.entity.Message;
-import com.olegator.chess.entity.UserChat;
+import com.olegator.chess.dto.chat.ChatCreatedDto;
+import com.olegator.chess.dto.chat.ChatMediaDto;
+import com.olegator.chess.dto.chat.ChatProfileDto;
+import com.olegator.chess.dto.chat.ChatSummaryDto;
+import com.olegator.chess.entity.chat.Chat;
+import com.olegator.chess.entity.chat.ChatMedia;
+import com.olegator.chess.entity.chat.event.ChatEvent;
+import com.olegator.chess.entity.chat.event.Message;
+import com.olegator.chess.entity.chat.UserChat;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -19,8 +20,8 @@ public interface ChatMapper {
     @Mapping(target = "usersIds", source = "userChats")
     ChatProfileDto mapToProfile(Chat chat);
     @Mapping(target = "avatarUrl", source = "chatMedia.avatarUrl")
-    @Mapping(target = "lastMessage", source = "messages")
-    @Mapping(target = "lastMessageTime", source = "messages")
+    @Mapping(target = "lastMessage", source = "events")
+    @Mapping(target = "lastMessageTime", source = "events")
     ChatSummaryDto mapToSummary(Chat chat);
 
     ChatCreatedDto mapToCreated(Chat chat);
@@ -30,17 +31,17 @@ public interface ChatMapper {
         return userChat.getUser().getId();
     }
 
-    default String getLastMessageContent(List<Message> messages) {
-        if (messages.isEmpty()) {
+    default String getLastMessageContent(List<ChatEvent> chatEvents) {
+        if (chatEvents.isEmpty()) {
             return "";
         }
-        return messages.getLast().getContent();
+        return chatEvents.getLast().toString(); //TODO make content getter
     }
 
-    default LocalDateTime getLastMessageTime(List<Message> messages) {
-        if (messages.isEmpty()) {
+    default LocalDateTime getLastMessageTime(List<ChatEvent> chatEvents) {
+        if (chatEvents.isEmpty()) {
             return null;
         }
-        return messages.getLast().getTimestamp();
+        return chatEvents.getLast().getTimestamp();
     }
 }

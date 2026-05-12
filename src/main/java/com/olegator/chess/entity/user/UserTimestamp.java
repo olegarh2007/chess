@@ -1,4 +1,4 @@
-package com.olegator.chess.entity;
+package com.olegator.chess.entity.user;
 
 import jakarta.persistence.*;
 import lombok.Data;

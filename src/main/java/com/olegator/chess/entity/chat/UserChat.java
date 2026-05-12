@@ -1,5 +1,6 @@
-package com.olegator.chess.entity;
+package com.olegator.chess.entity.chat;
 
+import com.olegator.chess.entity.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -11,7 +12,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "user_chat")
 public class UserChat {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

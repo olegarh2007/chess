@@ -2,12 +2,11 @@ package com.olegator.chess.service;
 
 import com.olegator.chess.dto.UserRegDto;
 import com.olegator.chess.dto.UserResponseDto;
-import com.olegator.chess.entity.User;
-import com.olegator.chess.entity.UserMedia;
-import com.olegator.chess.entity.UserTimestamp;
+import com.olegator.chess.entity.user.User;
+import com.olegator.chess.entity.user.UserMedia;
+import com.olegator.chess.entity.user.UserTimestamp;
 import com.olegator.chess.exception.UserAlreadyExistsException;
 import com.olegator.chess.exception.UserNotFoundException;
-import com.olegator.chess.mapper.ChatMapper;
 import com.olegator.chess.mapper.UserPageMapper;
 import com.olegator.chess.repository.UserRepository;
 import jakarta.transaction.Transactional;

@@ -1,5 +1,7 @@
-package com.olegator.chess.entity;
+package com.olegator.chess.entity.chat;
 
+import com.olegator.chess.entity.chat.event.ChatEvent;
+import com.olegator.chess.entity.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +30,7 @@ public class Chat {
     private ChatMedia chatMedia;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Message> messages = new ArrayList<>();
+    private List<ChatEvent> events = new ArrayList<>();
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserChat> userChats = new HashSet<>();
@@ -39,5 +41,10 @@ public class Chat {
         userChat.setChat(this);
         userChats.add(userChat);
         user.addChat(userChat);
+    }
+
+    public void addEvent(ChatEvent event) {
+        events.add(event);
+        event.setChat(this);
     }
 }

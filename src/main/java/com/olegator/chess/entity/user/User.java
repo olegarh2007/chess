@@ -1,5 +1,6 @@
-package com.olegator.chess.entity;
+package com.olegator.chess.entity.user;
 
+import com.olegator.chess.entity.chat.UserChat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

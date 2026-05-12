@@ -1,6 +1,5 @@
 package com.olegator.chess.controller;
 
-import com.olegator.chess.dto.ChatSummaryDto;
 import com.olegator.chess.dto.UserResponseDto;
 import com.olegator.chess.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -8,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor

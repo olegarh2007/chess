@@ -1,4 +1,4 @@
-package com.olegator.chess.entity;
+package com.olegator.chess.entity.user;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -9,15 +9,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "chat_media")
-public class ChatMedia {
+@Table(name = "user_media")
+public class UserMedia {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "chat_id", nullable = false)
-    private Chat chat;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "avatar_url")
     private String avatarUrl;

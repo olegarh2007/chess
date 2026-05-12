@@ -1,21 +1,27 @@
 package com.olegator.chess.service;
 
-import com.olegator.chess.dto.*;
-import com.olegator.chess.entity.Chat;
-import com.olegator.chess.entity.User;
-import com.olegator.chess.entity.UserChat;
+import com.olegator.chess.dto.chat.ChatCreatedDto;
+import com.olegator.chess.dto.chat.ChatCreationDto;
+import com.olegator.chess.dto.chat.ChatSummaryDto;
+import com.olegator.chess.dto.chat.event.AddUserEventDto;
+import com.olegator.chess.dto.chat.event.ChatEventDto;
+import com.olegator.chess.entity.chat.Chat;
+import com.olegator.chess.entity.chat.UserChat;
+import com.olegator.chess.entity.chat.event.AddUserEvent;
+import com.olegator.chess.entity.user.User;
 import com.olegator.chess.mapper.ChatMapper;
-import com.olegator.chess.mapper.MessageMapper;
+import com.olegator.chess.mapper.ChatEventMapper;
 import com.olegator.chess.repository.ChatRepository;
 import com.olegator.chess.repository.UserChatRepository;
 import com.olegator.chess.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,41 +32,41 @@ public class ChatService {
     private final UserRepository userRepository;
     private final ChatRepository chatRepository;
     private final ChatMapper chatMapper;
-    private final MessageMapper messageMapper;
+    private final ChatEventMapper chatEventMapper;
     private final UserChatRepository userChatRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public void createChat(Set<Long> users_ids) {
-        Chat chat = new Chat();
-        addUsers(users_ids, chat);
-        chatRepository.save(chat);
-    }
-
-    public boolean isMemberByEmail(String email, Long chatId) {
-        return userRepository.findByEmail(email).map(user ->
-                user.getUserChats().stream()
-                        .anyMatch(userChat -> userChat.getChat().getId().equals(chatId)))
-                        .orElse(false);
-    }
-
-    private void addUsers(Set<Long> usersIds, Chat chat) {
+    private void addUsers(Long adderId, Set<Long> usersIds, Chat chat) {
+        User adder = userRepository.findById(adderId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid adder id " + adderId));
         usersIds.forEach(userId -> {
             var maybeUser = userRepository.findById(userId);
             if (maybeUser.isEmpty()) {
                 throw new IllegalArgumentException("User with id " + userId + " not found");
             }
-            User user = maybeUser.get();
-            chat.addUser(user);
+            User added = maybeUser.get();
+            chat.addUser(added);
+            var addEvent = new AddUserEvent();
+            addEvent.setAdder(adder);
+            addEvent.setAdded(added);
+            chat.addEvent(addEvent);
+            sendToChat(chat.getId(),
+                    new AddUserEventDto(addEvent.getId(),
+                            adderId, added.getId(), LocalDateTime.now())
+            );
         });
-        chatRepository.save(chat);
     }
 
-    public void addUsersToChat(Long chatId, Set<Long> users_ids) {
+    public void addUsersToChat(Long chatId, Long adderId, Set<Long> users_ids) {
         var maybeChat = chatRepository.findById(chatId);
         if (maybeChat.isEmpty()) {
             throw new IllegalArgumentException("Chat with id " + chatId + " not found");
         }
+        if (!userChatRepository.existsByChatIdAndUserId(chatId, adderId)) {
+            throw new IllegalArgumentException("User " + adderId + " doesnt have access to chat " + chatId);
+        }
         Chat chat = maybeChat.get();
-        addUsers(users_ids, chat);
+        addUsers(adderId, users_ids, chat);
     }
 
     public Set<ChatSummaryDto> getMyChats(Long userId) {
@@ -75,7 +81,7 @@ public class ChatService {
         return chatSummaries;
     }
 
-    public List<MessageDto> getChatMessages(Long chatId, Long userId) {
+    public List<ChatEventDto> getChatMessages(Long chatId, Long userId) {
         var maybeChat = chatRepository.findById(chatId);
         if (maybeChat.isEmpty()) {
             throw new IllegalArgumentException("Chat with id " + chatId + " not found");
@@ -84,20 +90,25 @@ public class ChatService {
         if (userChatRepository.existsByChatIdAndUserId(chatId, userId)) {
             throw new AccessDeniedException("Access to chat denied: user isn't in chat");
         }
-        List<MessageDto> messages = chat.getMessages().stream()
-                .map(messageMapper::toMessageDto)
+        List<ChatEventDto> events = chat.getEvents().stream()
+                .map(chatEventMapper::mapChatEvent)
                 .collect(Collectors.toList());
-        return messages;
+        return events;
     }
 
-    public ChatCreatedDto createNewChat(ChatCreationDto chatCreationDto, Long userId) {
+    public ChatCreatedDto createNewChat(ChatCreationDto chatCreationDto, Long creatorId) {
         Chat chat = new Chat();
         chat.setName(chatCreationDto.name());
         chat.setDescription(chatCreationDto.description());
-        chatRepository.save(chat);
-        var user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("No user with id " + userId));
+        var user = userRepository.findById(creatorId)
+                .orElseThrow(() -> new IllegalStateException("No user with id " + creatorId));
         chat.addUser(user);
+        addUsers(creatorId, chatCreationDto.memberIds(), chat);
+        chatRepository.save(chat);
         return chatMapper.mapToCreated(chat);
+    }
+
+    private void sendToChat(Long chatId, ChatEventDto addMessage) {
+        messagingTemplate.convertAndSend("/app/chat." + chatId, addMessage);
     }
 }

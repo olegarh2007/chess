@@ -1,6 +1,6 @@
 package com.olegator.chess.stompcontroller;
 
-import com.olegator.chess.dto.ChatMessageDto;
+import com.olegator.chess.dto.chat.event.UserMessageDto;
 import com.olegator.chess.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -17,7 +17,7 @@ public class ChatStompController {
 
     @MessageMapping("/chat.{chatId}")
     public void handleChatMessage(@DestinationVariable Long chatId,
-                                  @Payload ChatMessageDto chatMessageDto,
+                                  @Payload UserMessageDto chatMessageDto,
                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
         messagingTemplate.convertAndSend("/topic/chat." + chatId, chatMessageDto);
     }

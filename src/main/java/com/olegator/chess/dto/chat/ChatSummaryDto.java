@@ -1,4 +1,4 @@
-package com.olegator.chess.dto;
+package com.olegator.chess.dto.chat;
 
 import java.time.LocalDateTime;
 

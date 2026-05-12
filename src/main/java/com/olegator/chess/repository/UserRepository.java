@@ -1,6 +1,6 @@
 package com.olegator.chess.repository;
 
-import com.olegator.chess.entity.User;
+import com.olegator.chess.entity.user.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
